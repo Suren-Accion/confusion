@@ -39,12 +39,16 @@ class Home extends Component {
 
   static navigationOptions = {
     title: 'Home',
+    headerTintColor: '#fff',
+    headerStyle: {
+      backgroundColor: '#512DA8'
+    }
   };
 
   render() {
 
     return (
-      <ScrollView>
+      <ScrollView style={{ flex: 1, backgroundColor: '#E9ECEF' }}>
         <RenderItem item={this.state.dishes.filter((dish) => dish.featured)[0]} />
         <RenderItem item={this.state.promotions.filter((promo) => promo.featured)[0]} />
         <RenderItem item={this.state.leaders.filter((leader) => leader.featured)[0]} />
