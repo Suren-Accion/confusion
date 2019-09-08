@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Text, FlatList, ScrollView } from 'react-native';
 import { Card, CardTitle, ListItem } from 'react-native-elements';
-import { LEADERS } from '../shared/leaders';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
+import { Loading } from './LoadingComponent';
 
 const mapStateToProps = state => {
   return {
@@ -45,23 +45,47 @@ class About extends Component {
           title={<Text style={{ fontWeight: 'bold' }}>{item.name}</Text>}
           subtitle={item.description}
           hideChevron={true}
-          leftAvatar={{ source: {uri: baseUrl + item.image}}}
+          leftAvatar={{ source: { uri: baseUrl + item.image } }}
         />
       );
     }
 
-    return (
-      <ScrollView style={{ flex: 1, backgroundColor: '#E9ECEF' }} >
-        <History />
-        <Card titleStyle={{ fontSize: 16 }} title="Corporate Leadership" >
-          <FlatList
-            data={this.props.leaders.leaders}
-            renderItem={renderLeaderItem}
-            keyExtractor={item => item.id.toString()}
-          />
-        </Card>
-      </ScrollView>
-    );
+    if (this.props.leaders.isLoading) {
+      return (
+        <ScrollView>
+          <History />
+          <Card
+            title='Corporate Leadership'>
+            <Loading />
+          </Card>
+        </ScrollView>
+      );
+    }
+    else if (this.props.leaders.errMess) {
+      return (
+        <ScrollView>
+          <History />
+          <Card
+            title='Corporate Leadership'>
+            <Text>{this.props.leaders.errMess}</Text>
+          </Card>
+        </ScrollView>
+      );
+    }
+    else {
+      return (
+        <ScrollView style={{ flex: 1, backgroundColor: '#E9ECEF' }} >
+          <History />
+          <Card titleStyle={{ fontSize: 16 }} title="Corporate Leadership" >
+            <FlatList
+              data={this.props.leaders.leaders}
+              renderItem={renderLeaderItem}
+              keyExtractor={item => item.id.toString()}
+            />
+          </Card>
+        </ScrollView>
+      );
+    }
   }
 }
 
