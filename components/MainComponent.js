@@ -6,6 +6,7 @@ import About from "./AboutComponent";
 import Contact from "./ContactComponent";
 import Favorites from './FavoriteComponent';
 import Reservation from './ReservationComponent';
+import Login from './LoginComponent';
 import { View, Platform, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { createStackNavigator, createDrawerNavigator, DrawerItems, SafeAreaView } from 'react-navigation';
 import { Icon } from 'react-native-elements';
@@ -54,7 +55,6 @@ const MenuNavigator = createStackNavigator({
     }
   }
 );
-
 const HomeNavigator = createStackNavigator({
   Home: { screen: Home }
 }, {
@@ -157,6 +157,22 @@ const FavoritesNavigator = createStackNavigator({
     })
   })
 
+const LoginNavigator = createStackNavigator({
+  Login: { screen: Login }
+}, {
+    navigationOptions: ({ navigation }) => ({
+      headerStyle: {
+        backgroundColor: "#512DA8"
+      },
+      headerTitleStyle: {
+        color: "#fff"
+      },
+      headerTintColor: "#fff",
+      headerLeft: <Icon name="menu" size={24}
+        iconStyle={{ color: 'white' }}
+        onPress={() => navigation.toggleDrawer()} />
+    })
+  });
 const CustomDrawerContentComponent = (props) => (
   <ScrollView>
     <SafeAreaView style={styles.container} forceInset={{ top: 'always', horizontal: 'never' }}>
@@ -174,6 +190,22 @@ const CustomDrawerContentComponent = (props) => (
 );
 
 const MainNavigator = createDrawerNavigator({
+  Login:
+  {
+    screen: LoginNavigator,
+    navigationOptions: {
+      title: 'Login',
+      drawerLabel: 'Login',
+      drawerIcon: ({ tintColor, focused }) => (
+        <Icon
+          name='sign-in'
+          type='font-awesome'
+          size={24}
+          iconStyle={{ color: tintColor }}
+        />
+      ),
+    }
+  },
   Home:
   {
     screen: HomeNavigator,
@@ -257,10 +289,11 @@ const MainNavigator = createDrawerNavigator({
         />
       ),
     }
-  }
+  },
 },
 
   {
+    initialRouteName: 'Home',
     drawerBackgroundColor: '#D1C4E9',
     contentComponent: CustomDrawerContentComponent
   });
