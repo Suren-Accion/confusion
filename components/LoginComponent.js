@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, ScrollView, Image } from 'react-native';
-import { Icon, Input, CheckBox, Button } from 'react-native-elements';
+import { View, Button, StyleSheet, Text, ScrollView, Image } from 'react-native';
+import { Card, Icon, Input, CheckBox } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
-import { createBottomTabNavigator } from 'react-navigation';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Asset } from 'expo-asset';
+import { createBottomTabNavigator } from 'react-navigation';
 import { baseUrl } from '../shared/baseUrl';
 
 class LoginTab extends Component {
@@ -46,6 +46,7 @@ class LoginTab extends Component {
   };
 
   handleLogin() {
+    console.log(JSON.stringify(this.state));
     if (this.state.remember)
       SecureStore.setItemAsync('userinfo', JSON.stringify({ username: this.state.username, password: this.state.password }))
         .catch((error) => console.log('Could not save user info', error));
@@ -118,13 +119,29 @@ class RegisterTab extends Component {
       });
       if (!capturedImage.cancelled) {
         console.log(capturedImage);
-        this.setState({ imageUrl: capturedImage.uri });
+        this.processImage(capturedImage.uri);
       }
     }
 
   }
+
+  getImageFromGallery = async () => {
+    const cameraRollPermission = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+    if (cameraRollPermission.status === 'granted') {
+      let Image = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+      if (!Image.cancelled) {
+        console.log(Image);
+        this.processImage(Image.uri);
+      }
+    }
+  }
+
   processImage = async (imageUri) => {
-    let processedImage = await ImageManipulator.manipulate(
+    let processedImage = await ImageManipulator.manipulateAsync(
       imageUri,
       [
         { resize: { width: 400 } }
@@ -138,7 +155,7 @@ class RegisterTab extends Component {
 
   static navigationOptions = {
     title: 'Register',
-    tabBarIcon: ({ tintColor, focused }) => (
+    tabBarIcon: ({ tintColor }) => (
       <Icon
         name='user-plus'
         type='font-awesome'
@@ -169,6 +186,10 @@ class RegisterTab extends Component {
               title="Camera"
               onPress={this.getImageFromCamera}
             />
+            <Button
+              title="Gallary"
+              onPress={this.getImageFromGallery}
+            />
           </View>
           <Input
             placeholder="Username"
@@ -187,7 +208,7 @@ class RegisterTab extends Component {
           <Input
             placeholder="First Name"
             leftIcon={{ type: 'font-awesome', name: 'user-o' }}
-            onChangeText={(lastname) => this.setState({ firstname })}
+            onChangeText={(firstname) => this.setState({ firstname })}
             value={this.state.firstname}
             containerStyle={styles.formInput}
           />
@@ -238,11 +259,12 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     margin: 20,
+    flex: 1
   },
   imageContainer: {
-    flex: 1,
     flexDirection: 'row',
-    margin: 20
+    justifyContent: "space-around",
+    alignItems: "center"
   },
   image: {
     margin: 10,
@@ -250,14 +272,14 @@ const styles = StyleSheet.create({
     height: 60
   },
   formInput: {
-    margin: 20
+    marginVertical: 40
   },
   formCheckbox: {
-    margin: 20,
+    marginVertical: 40,
     backgroundColor: null
   },
   formButton: {
-    margin: 60
+    marginVertical: 40
   }
 });
 
